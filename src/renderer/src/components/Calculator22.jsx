@@ -23,7 +23,7 @@ let allowedValues = [
   'Delete'
 ]
 
-const Calculator = () => {
+const Calculator22 = () => {
   const [expression, setExpression] = useState('')
 
   let calculateExpression = (value) => {
@@ -102,4 +102,4 @@ const Calculator = () => {
   )
 }
 
-export default Calculator
+export default Calculator22

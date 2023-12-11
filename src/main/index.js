@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow } from 'electron'
+import {app, shell, BrowserWindow, Menu} from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -6,11 +6,11 @@ import icon from '../../resources/icon.png?asset'
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 350,
-    height: 410,
+    width: 1500,
+    height: 800,
     show: false,
-    resizable: false,
-    autoHideMenuBar: true,
+    resizable: true,
+    autoHideMenuBar: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -21,6 +21,44 @@ function createWindow() {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+
+
+  const template = [
+    {
+      label: 'Reset ⚠',
+      submenu: [
+        {
+          label: 'Reload',
+          click: () => {
+            mainWindow.webContents.executeJavaScript(`
+              window.location.href = "http://localhost:3000/";
+            `);
+          },
+        },
+        {
+          label: 'Reset ToDo List',
+          click: () => {
+            mainWindow.webContents.executeJavaScript(`
+              localStorage.removeItem('data')
+              window.location.href = "http://localhost:3000/";
+            `);
+          },
+        },
+        {
+          label: 'Reset Green Effort',
+          click: () => {
+            mainWindow.webContents.executeJavaScript(`
+              localStorage.removeItem('green')
+              window.location.href = "http://localhost:3000/";
+            `);
+          },
+        },
+      ],
+    },
+  ];
+
+  const customMenu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(customMenu);
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -35,6 +73,10 @@ function createWindow() {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
+
+
+
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
